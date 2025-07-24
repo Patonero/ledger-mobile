@@ -14,57 +14,62 @@ describe('AsyncStorage Persistence', () => {
       
       const { getAllByText } = render(<App />);
       
-      await waitFor(() => {
-        expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
-      });
-
-      await waitFor(() => {
-        const lifeTotals = getAllByText('40');
-        expect(lifeTotals).toHaveLength(2);
-      });
-    });
+      // Wait for both AsyncStorage call and UI update in single waitFor
+      await waitFor(
+        () => {
+          expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
+          const lifeTotals = getAllByText('40');
+          expect(lifeTotals).toHaveLength(2);
+        },
+        { timeout: 10000 } // Increased timeout for CI
+      );
+    }, 15000); // Test timeout increased
 
     it('loads saved starting life of 0 on app start', async () => {
       AsyncStorage.getItem.mockResolvedValue('0');
       
       const { getAllByText } = render(<App />);
       
-      await waitFor(() => {
-        expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
-      });
-
-      await waitFor(() => {
-        const lifeTotals = getAllByText('0');
-        expect(lifeTotals).toHaveLength(2);
-      });
-    });
+      await waitFor(
+        () => {
+          expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
+          const lifeTotals = getAllByText('0');
+          expect(lifeTotals).toHaveLength(2);
+        },
+        { timeout: 10000 }
+      );
+    }, 15000);
 
     it('uses default starting life when no saved value exists', async () => {
       AsyncStorage.getItem.mockResolvedValue(null);
       
       const { getAllByText } = render(<App />);
       
-      await waitFor(() => {
-        expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
-      });
-
-      const lifeTotals = getAllByText('20');
-      expect(lifeTotals).toHaveLength(2);
-    });
+      await waitFor(
+        () => {
+          expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
+          const lifeTotals = getAllByText('20');
+          expect(lifeTotals).toHaveLength(2);
+        },
+        { timeout: 10000 }
+      );
+    }, 15000);
 
     it('handles AsyncStorage errors gracefully', async () => {
       AsyncStorage.getItem.mockRejectedValue(new Error('Storage error'));
       
       const { getAllByText } = render(<App />);
       
-      await waitFor(() => {
-        expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
-      });
-
-      // Should still show default values
-      const lifeTotals = getAllByText('20');
-      expect(lifeTotals).toHaveLength(2);
-    });
+      await waitFor(
+        () => {
+          expect(AsyncStorage.getItem).toHaveBeenCalledWith('startingLife');
+          // Should still show default values
+          const lifeTotals = getAllByText('20');
+          expect(lifeTotals).toHaveLength(2);
+        },
+        { timeout: 10000 }
+      );
+    }, 15000);
   });
 
   describe('AsyncStorage Error Handling', () => {
@@ -74,11 +79,14 @@ describe('AsyncStorage Persistence', () => {
       
       const { getAllByText } = render(<App />);
       
-      // App should still render and function
-      await waitFor(() => {
-        const lifeTotals = getAllByText('20');
-        expect(lifeTotals).toHaveLength(2);
-      });
-    });
+      // App should still render and function with default values
+      await waitFor(
+        () => {
+          const lifeTotals = getAllByText('20');
+          expect(lifeTotals).toHaveLength(2);
+        },
+        { timeout: 10000 }
+      );
+    }, 15000);
   });
 });

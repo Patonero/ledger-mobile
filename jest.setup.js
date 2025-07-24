@@ -14,12 +14,12 @@ jest.mock('expo-keep-awake', () => ({
   deactivateKeepAwake: jest.fn(),
 }));
 
-// Mock AsyncStorage
+// Mock AsyncStorage with more stable promises
 jest.mock('@react-native-async-storage/async-storage', () => ({
-  getItem: jest.fn(() => Promise.resolve(null)),
-  setItem: jest.fn(() => Promise.resolve()),
-  removeItem: jest.fn(() => Promise.resolve()),
-  clear: jest.fn(() => Promise.resolve()),
+  getItem: jest.fn().mockResolvedValue(null),
+  setItem: jest.fn().mockResolvedValue(undefined),
+  removeItem: jest.fn().mockResolvedValue(undefined),
+  clear: jest.fn().mockResolvedValue(undefined),
 }));
 
 // Silence console warnings during tests
