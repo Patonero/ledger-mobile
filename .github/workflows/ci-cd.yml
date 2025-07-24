@@ -127,7 +127,7 @@ jobs:
           fi
           
           # Add build info
-          CHANGELOG="$CHANGELOG"$'\n'"### 📱 Build Information"$'\n'
+          CHANGELOG="$CHANGELOG"$'\n'"### 📱 Version Information"$'\n'
           CHANGELOG="$CHANGELOG""- **Version**: ${{ steps.version.outputs.version }}"$'\n'
           CHANGELOG="$CHANGELOG""- **Android Version Code**: $(($(node -p "require('./app.json').expo.android.versionCode") + 1))"$'\n'
           CHANGELOG="$CHANGELOG""- **iOS Build Number**: $(($(node -p "require('./app.json').expo.ios.buildNumber") + 1))"$'\n'
@@ -183,14 +183,11 @@ jobs:
             - **React**: 19.0.0
             - **Node.js**: ≥22.0.0
             
-            ### 📋 Testing
+            ### 📋 Quality Assurance
             
-            This release includes **${{ env.TEST_COUNT || '40+' }} automated tests** covering:
-            - Life tracking functionality
-            - Settings and persistence
-            - Haptic feedback
-            - Error handling
-            - Cross-platform compatibility
+            ✅ **Code Quality**: ESLint passed  
+            ✅ **Testing**: 40+ automated tests covering life tracking, settings, haptic feedback, and error handling  
+            ✅ **Version Management**: Automated semantic versioning based on commit messages
             
             ---
             
