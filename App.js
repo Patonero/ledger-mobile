@@ -5,13 +5,14 @@ import {
   View,
   TouchableOpacity,
   Dimensions,
-  StatusBar,
   Platform,
   Modal,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as KeepAwake from "expo-keep-awake";
 import * as Haptics from "expo-haptics";
+import * as NavigationBar from "expo-navigation-bar";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,20 +43,34 @@ export default function App() {
     loadStartingLife();
   }, []);
 
-  // Keep screen awake during gameplay (mobile only)
+  // Keep screen awake and hide navigation bar during gameplay (mobile only)
   useEffect(() => {
     if (Platform.OS !== "web") {
       try {
         KeepAwake.activateKeepAwakeAsync();
+
+        // Hide Android navigation bar for immersive experience
+        if (Platform.OS === "android") {
+          NavigationBar.setVisibilityAsync("hidden");
+        }
+
         return () => {
           try {
             KeepAwake.deactivateKeepAwake();
+
+            // Restore navigation bar when app closes
+            if (Platform.OS === "android") {
+              NavigationBar.setVisibilityAsync("visible");
+            }
           } catch (error) {
-            console.log("Error deactivating keep awake:", error);
+            console.log(
+              "Error deactivating keep awake or restoring nav bar:",
+              error
+            );
           }
         };
       } catch (error) {
-        console.log("Error activating keep awake:", error);
+        console.log("Error activating keep awake or hiding nav bar:", error);
       }
     }
   }, []);
@@ -178,7 +193,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {Platform.OS !== "web" && <StatusBar hidden />}
+      <StatusBar style="light" hidden={Platform.OS !== "web"} translucent />
 
       <PlayerSection
         playerNumber={2}
@@ -286,6 +301,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#000",
+    paddingTop: Platform.OS === "android" ? 0 : 0,
     ...(Platform.OS === "web" && {
       width: "100vw",
       height: "100vh",

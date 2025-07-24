@@ -25,6 +25,16 @@
       "package": "com.patonero.ledger",
       "versionCode": 1
     },
+    "androidNavigationBar": {
+      "visible": "immersive",
+      "behavior": "immersive-sticky",
+      "backgroundColor": "#000000"
+    },
+    "androidStatusBar": {
+      "hidden": true,
+      "backgroundColor": "#000000",
+      "barStyle": "light-content"
+    },
     "web": {
       "bundler": "metro"
     },
