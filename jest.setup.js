@@ -14,6 +14,19 @@ jest.mock('expo-keep-awake', () => ({
   deactivateKeepAwake: jest.fn(),
 }));
 
+// Mock expo-navigation-bar
+jest.mock('expo-navigation-bar', () => ({
+  setVisibilityAsync: jest.fn(),
+  addVisibilityListener: jest.fn(),
+  removeVisibilityListener: jest.fn(),
+}));
+
+// Mock expo-status-bar
+jest.mock('expo-status-bar', () => ({
+  StatusBar: 'StatusBar',
+}));
+
+
 // Mock AsyncStorage with more stable promises
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn().mockResolvedValue(null),
@@ -23,8 +36,19 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 }));
 
 // Silence console warnings during tests
+const originalConsole = { ...console };
 global.console = {
   ...console,
   warn: jest.fn(),
   error: jest.fn(),
+  log: jest.fn((...args) => {
+    // Allow through test-related logs but suppress expected error logs
+    const message = args.join(' ');
+    if (!message.includes('Error activating keep awake') && 
+        !message.includes('Error deactivating keep awake') &&
+        !message.includes('Nav bar failed') &&
+        !message.includes('Keep awake failed')) {
+      originalConsole.log(...args);
+    }
+  }),
 };
