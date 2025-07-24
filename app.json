@@ -3,6 +3,9 @@
     "name": "Ledger",
     "slug": "ledger",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "assetBundlePatterns": ["**/*"],
@@ -12,13 +15,15 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.kenrms.ledger",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "backgroundColor": "#000000",
-      "package": "com.kenrms.ledger"
+      "package": "com.kenrms.ledger",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro"
