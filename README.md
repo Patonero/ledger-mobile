@@ -3,6 +3,7 @@
 A minimalistic cross-platform life tracker for Trading Card Games like Magic: The Gathering and Disney Lorcana.
 
 <img height="380" alt="image" src="https://github.com/user-attachments/assets/0d3c9f28-2642-48d3-a24e-628bd28d9104" />
+<img height="180" alt="image" src="https://github.com/user-attachments/assets/bfff6e81-a325-4373-9c93-b4be8f496a94" />
 
 ## ✨ Features
 
