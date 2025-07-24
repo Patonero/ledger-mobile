@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
 import {
   StyleSheet,
   Text,
@@ -19,10 +19,8 @@ export default function App() {
   const [player2Life, setPlayer2Life] = useState(20);
   const [startingLife, setStartingLife] = useState(20);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [player1LifeChange, setPlayer1LifeChange] = useState(0);
-  const [player2LifeChange, setPlayer2LifeChange] = useState(0);
-  const [changeTimeout1, setChangeTimeout1] = useState(null);
-  const [changeTimeout2, setChangeTimeout2] = useState(null);
+  const [lifeChanges, setLifeChanges] = useState({ player1: 0, player2: 0 });
+  const timeoutRefs = useMemo(() => ({ player1: null, player2: null }), []);
 
   // Load saved starting life on app start
   useEffect(() => {
@@ -61,57 +59,51 @@ export default function App() {
     }
   }, []);
 
-  const adjustLife = (player, amount) => {
-    if (player === 1) {
-      setPlayer1Life(Math.max(0, player1Life + amount));
+  const adjustLife = useCallback(
+    (player, amount) => {
+      const playerKey = `player${player}`;
+
+      if (player === 1) {
+        setPlayer1Life((prev) => Math.max(0, prev + amount));
+      } else {
+        setPlayer2Life((prev) => Math.max(0, prev + amount));
+      }
 
       // Clear existing timeout
-      if (changeTimeout1) {
-        clearTimeout(changeTimeout1);
+      if (timeoutRefs[playerKey]) {
+        clearTimeout(timeoutRefs[playerKey]);
       }
 
       // Update cumulative change
-      setPlayer1LifeChange((prev) => prev + amount);
+      setLifeChanges((prev) => ({
+        ...prev,
+        [playerKey]: prev[playerKey] + amount,
+      }));
 
       // Set new timeout to clear the change display
-      const timeout = setTimeout(() => {
-        setPlayer1LifeChange(0);
-        setChangeTimeout1(null);
+      timeoutRefs[playerKey] = setTimeout(() => {
+        setLifeChanges((prev) => ({
+          ...prev,
+          [playerKey]: 0,
+        }));
+        timeoutRefs[playerKey] = null;
       }, 2000);
-      setChangeTimeout1(timeout);
-    } else {
-      setPlayer2Life(Math.max(0, player2Life + amount));
+    },
+    [timeoutRefs]
+  );
 
-      // Clear existing timeout
-      if (changeTimeout2) {
-        clearTimeout(changeTimeout2);
-      }
-
-      // Update cumulative change
-      setPlayer2LifeChange((prev) => prev + amount);
-
-      // Set new timeout to clear the change display
-      const timeout = setTimeout(() => {
-        setPlayer2LifeChange(0);
-        setChangeTimeout2(null);
-      }, 2000);
-      setChangeTimeout2(timeout);
-    }
-  };
-
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setPlayer1Life(startingLife);
     setPlayer2Life(startingLife);
-    setPlayer1LifeChange(0);
-    setPlayer2LifeChange(0);
-    if (changeTimeout1) clearTimeout(changeTimeout1);
-    if (changeTimeout2) clearTimeout(changeTimeout2);
-    setChangeTimeout1(null);
-    setChangeTimeout2(null);
+    setLifeChanges({ player1: 0, player2: 0 });
+    if (timeoutRefs.player1) clearTimeout(timeoutRefs.player1);
+    if (timeoutRefs.player2) clearTimeout(timeoutRefs.player2);
+    timeoutRefs.player1 = null;
+    timeoutRefs.player2 = null;
     setMenuVisible(false);
-  };
+  }, [startingLife, timeoutRefs]);
 
-  const setStartingLifeTotal = async (life) => {
+  const setStartingLifeTotal = useCallback(async (life) => {
     setStartingLife(life);
     setPlayer1Life(life);
     setPlayer2Life(life);
@@ -123,39 +115,52 @@ export default function App() {
     } catch (error) {
       console.log("Error saving starting life:", error);
     }
-  };
+  }, []);
 
-  const PlayerSection = ({ playerNumber, life, lifeChange, isTop = false }) => (
-    <View style={[styles.playerSection, isTop && styles.topPlayer]}>
-      <TouchableOpacity
-        style={styles.decreaseZone}
-        onPress={() => adjustLife(playerNumber, -1)}
-        activeOpacity={0.3}
-      >
-        <View style={styles.buttonIndicator}>
-          <Text style={styles.buttonText}>-</Text>
+  const PlayerSection = memo(
+    ({ playerNumber, life, lifeChange, isTop = false }) => {
+      const onDecreasePress = useCallback(
+        () => adjustLife(playerNumber, -1),
+        [adjustLife, playerNumber]
+      );
+      const onIncreasePress = useCallback(
+        () => adjustLife(playerNumber, 1),
+        [adjustLife, playerNumber]
+      );
+      const containerStyle = useMemo(
+        () => [styles.playerSection, isTop && styles.topPlayer],
+        [isTop]
+      );
+
+      return (
+        <View style={containerStyle}>
+          <TouchableOpacity
+            style={styles.decreaseZone}
+            onPress={onDecreasePress}
+            activeOpacity={0.3}
+          >
+            <Text style={styles.buttonText}>-</Text>
+          </TouchableOpacity>
+
+          <View style={styles.lifeZone}>
+            {lifeChange !== 0 && (
+              <Text style={styles.lifeChange}>
+                {lifeChange > 0 ? `+${lifeChange}` : lifeChange}
+              </Text>
+            )}
+            <Text style={styles.lifeTotal}>{life}</Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.increaseZone}
+            onPress={onIncreasePress}
+            activeOpacity={0.3}
+          >
+            <Text style={styles.buttonText}>+</Text>
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
-
-      <View style={styles.lifeZone}>
-        {lifeChange !== 0 && (
-          <Text style={styles.lifeChange}>
-            {lifeChange > 0 ? `+${lifeChange}` : lifeChange}
-          </Text>
-        )}
-        <Text style={styles.lifeTotal}>{life}</Text>
-      </View>
-
-      <TouchableOpacity
-        style={styles.increaseZone}
-        onPress={() => adjustLife(playerNumber, 1)}
-        activeOpacity={0.3}
-      >
-        <View style={styles.buttonIndicator}>
-          <Text style={styles.buttonText}>+</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+      );
+    }
   );
 
   return (
@@ -165,7 +170,7 @@ export default function App() {
       <PlayerSection
         playerNumber={2}
         life={player2Life}
-        lifeChange={player2LifeChange}
+        lifeChange={lifeChanges.player2}
         isTop={true}
       />
 
@@ -258,7 +263,7 @@ export default function App() {
       <PlayerSection
         playerNumber={1}
         life={player1Life}
-        lifeChange={player1LifeChange}
+        lifeChange={lifeChanges.player1}
       />
     </View>
   );
@@ -292,12 +297,14 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(255, 0, 0, 0.1)",
   },
   increaseZone: {
     flex: 1,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0, 255, 0, 0.1)",
   },
   lifeZone: {
     flex: 1,
@@ -319,18 +326,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     alignSelf: "center",
   },
-  buttonIndicator: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#555",
-  },
   buttonText: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 48,
     fontWeight: "bold",
+    opacity: 0.7,
   },
   centerSection: {
     flexDirection: "row",
