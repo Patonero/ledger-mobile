@@ -6,6 +6,9 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "assetBundlePatterns": ["**/*"],
+    "splash": {
+      "backgroundColor": "#000000"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.kenrms.ledger",
