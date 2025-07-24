@@ -48,11 +48,28 @@ git commit -m "feat!: redesign app architecture"
 - **Android versionCode**: Increments by 1 each build (1, 2, 3...)
 - **iOS buildNumber**: Increments by 1 each build ("1", "2", "3"...)
 
+## Automated Release Process
+
+When you push to `main`, the system will:
+
+1. **Bump version** based on commit messages
+2. **Update version files** (package.json, app.json)
+3. **Generate changelog** from commit history
+4. **Create git tag** for the release
+5. **Build the app** with EAS Build
+6. **Create GitHub release** with:
+   - Categorized changelog
+   - Build information
+   - Download links
+   - Technical details
+   - Testing coverage info
+
 ## Version Files Updated
 
 - `package.json` - npm version
 - `app.json` - Expo version, versionCode, buildNumber
 - Git commit with `[skip ci]` to avoid infinite loops
+- Git tag created for release
 
 ## Skipping Version Bump
 
