@@ -58,8 +58,8 @@ jobs:
       - name: Build for Android
         run: eas build --platform android --profile preview --non-interactive --no-wait
 
-      - name: Build for iOS
-        run: eas build --platform ios --profile preview --non-interactive --no-wait
+      # - name: Build for iOS
+      #   run: eas build --platform ios --profile preview --non-interactive --no-wait
 
       - name: Comment build links
         uses: actions/github-script@v7
