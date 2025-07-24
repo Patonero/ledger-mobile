@@ -139,7 +139,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - [ ] Sound effects or haptics for life changes
 - [ ] Game timer
-- [ ] Custom themes and colors
+- [ ] Multiple player support (3-4 players)
 
 ---
 
