@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions, StatusBar, Platform, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as KeepAwake from 'expo-keep-awake';
 
 const { width, height } = Dimensions.get('window');
@@ -9,6 +10,25 @@ export default function App() {
   const [player2Life, setPlayer2Life] = useState(20);
   const [startingLife, setStartingLife] = useState(20);
   const [menuVisible, setMenuVisible] = useState(false);
+
+  // Load saved starting life on app start
+  useEffect(() => {
+    const loadStartingLife = async () => {
+      try {
+        const savedStartingLife = await AsyncStorage.getItem('startingLife');
+        if (savedStartingLife !== null) {
+          const life = parseInt(savedStartingLife, 10);
+          setStartingLife(life);
+          setPlayer1Life(life);
+          setPlayer2Life(life);
+        }
+      } catch (error) {
+        console.log('Error loading starting life:', error);
+      }
+    };
+    
+    loadStartingLife();
+  }, []);
 
   // Keep screen awake during gameplay (mobile only)
   useEffect(() => {
@@ -42,11 +62,18 @@ export default function App() {
     setMenuVisible(false);
   };
 
-  const setStartingLifeTotal = (life) => {
+  const setStartingLifeTotal = async (life) => {
     setStartingLife(life);
     setPlayer1Life(life);
     setPlayer2Life(life);
     setMenuVisible(false);
+    
+    // Save to AsyncStorage
+    try {
+      await AsyncStorage.setItem('startingLife', life.toString());
+    } catch (error) {
+      console.log('Error saving starting life:', error);
+    }
   };
 
   const PlayerSection = ({ playerNumber, life, isTop = false }) => (
@@ -154,13 +181,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
     ...(Platform.OS === 'web' && {
-      maxWidth: 400,
-      maxHeight: 800,
-      alignSelf: 'center',
-      marginTop: 20,
-      borderRadius: 12,
+      width: '100vw',
+      height: '100vh',
+      maxWidth: 'none',
+      maxHeight: 'none',
+      alignSelf: 'stretch',
+      margin: 0,
+      borderRadius: 0,
       overflow: 'hidden',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
     }),
   },
   playerSection: {
