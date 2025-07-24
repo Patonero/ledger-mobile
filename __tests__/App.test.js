@@ -126,7 +126,7 @@ describe("Ledger Mobile App", () => {
   });
 
   describe("Haptic Feedback", () => {
-    it("triggers light haptic feedback on life adjustment", async () => {
+    it("triggers light haptic feedback on single life adjustment", async () => {
       const { getAllByText } = render(<App />);
       const increaseButtons = getAllByText("+");
 
