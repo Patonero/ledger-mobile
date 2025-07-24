@@ -158,7 +158,10 @@ export default function App() {
                 {lifeChange > 0 ? `+${lifeChange}` : lifeChange}
               </Text>
             )}
-            <Text style={styles.lifeTotal}>{life}</Text>
+            <View style={styles.lifeTotalContainer}>
+              <Text style={styles.lifeTotal}>{life}</Text>
+              <View style={styles.orientationDot} />
+            </View>
           </View>
 
           <TouchableOpacity
@@ -321,16 +324,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  lifeTotalContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
   lifeTotal: {
     color: "#fff",
-    fontSize: 72,
-    fontWeight: "300",
+    fontSize: 84,
+    fontWeight: "700",
     textAlign: "center",
     letterSpacing: -1,
   },
+  orientationDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.35)",
+    marginTop: -8,
+  },
   lifeChange: {
     position: "absolute",
-    top: -28,
+    top: -32,
     color: "#fff",
     fontSize: 20,
     fontWeight: "300",
