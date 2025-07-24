@@ -23,7 +23,6 @@
     "web": {
       "bundler": "metro"
     },
-    "sdkVersion": "50.0.0",
     "extra": {
       "eas": {
         "projectId": "b0343acb-27c6-42a1-83c1-51067ed85411"
