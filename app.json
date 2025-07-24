@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kenrms.ledger",
+      "bundleIdentifier": "com.patonero.ledger",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -22,7 +22,7 @@
     },
     "android": {
       "backgroundColor": "#000000",
-      "package": "com.kenrms.ledger",
+      "package": "com.patonero.ledger",
       "versionCode": 1
     },
     "web": {
@@ -33,6 +33,6 @@
         "projectId": "48080594-2715-442c-8cf4-5ffa6370638c"
       }
     },
-    "owner": "kenrms"
+    "owner": "patonero"
   }
 }
