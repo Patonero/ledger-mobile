@@ -11,7 +11,10 @@
       "Bash(avdmanager list:*)",
       "Bash(npx expo install:*)",
       "Bash(npx expo start:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(eas build:*)",
+      "Bash(expo doctor:*)",
+      "Bash(npx expo:*)"
     ],
     "deny": []
   }
