@@ -115,6 +115,9 @@ npm run web
 - `npm run android` - Run on Android
 - `npm run ios` - Run on iOS
 - `npm run web` - Run in browser
+- `npm test` - Run unit tests
+- `npm run test:coverage` - Run tests with coverage
+- `npm run lint` - Check code quality
 
 ### Architecture Notes
 
@@ -122,6 +125,17 @@ npm run web
 - Modal-based settings menu for clean UX
 - Flexbox layout with touch zones spanning full height
 - Platform-specific optimizations (keep-awake on mobile)
+
+### Testing
+
+The app includes comprehensive unit tests with **68% code coverage**:
+
+- **Core functionality**: Life tracking, bounds checking, haptic feedback
+- **Persistence**: AsyncStorage integration and error handling
+- **UI interactions**: Life change indicators and timeout behavior
+- **Error resilience**: Graceful degradation when storage fails
+
+Run tests with `npm test` or `npm run test:coverage` for detailed reports.
 
 ## 🤝 Contributing
 

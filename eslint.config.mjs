@@ -16,6 +16,7 @@ export default [
         ...globals.browser,
         ...globals.node,
         ...globals.es2022,
+        ...globals.jest,
       },
     },
     rules: {
@@ -23,7 +24,7 @@ export default [
         "warn",
         {
           varsIgnorePattern:
-            "^(React|Text|View|TouchableOpacity|StatusBar|Modal|PlayerSection|width|height)$",
+            "^(React|Text|View|TouchableOpacity|StatusBar|Modal|PlayerSection|width|height|App)$",
           argsIgnorePattern: "^_",
         },
       ],
