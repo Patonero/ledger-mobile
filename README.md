@@ -69,9 +69,9 @@ npm run web
 - **Starting Life**: Choose from 0, 20, or 40 life
 
 ### Game Format Support
-- **20 Life**: Magic: The Gathering, Disney Lorcana
+- **20 Life**: Magic: The Gathering
 - **40 Life**: MTG Commander/EDH, Two-Headed Giant
-- **0 Life**: Custom formats or alternate win conditions
+- **0 Life**: Lorcana
 
 ## 🏗️ Technical Details
 
@@ -124,12 +124,8 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🎯 Roadmap
 
-- [ ] Sound effects for life changes
-- [ ] Poison/energy counters
 - [ ] Game timer
 - [ ] Multiple player support (3-4 players)
-- [ ] Life history/undo functionality
-- [ ] Custom themes and colors
 
 ---
 
