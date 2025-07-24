@@ -74,18 +74,18 @@ describe("Ledger Mobile App", () => {
       expect(getAllByText("19")[0]).toBeTruthy();
     });
 
-    it("prevents life from going below 0", async () => {
+    it("allows negative life totals", async () => {
       const { getAllByText } = render(<App />);
       const decreaseButtons = getAllByText("-");
 
-      // Press decrease button 25 times to try to go below 0
+      // Press decrease button 25 times to go below 0
       await act(async () => {
         for (let i = 0; i < 25; i++) {
           fireEvent.press(decreaseButtons[1]);
         }
       });
 
-      expect(getAllByText("0")[0]).toBeTruthy();
+      expect(getAllByText("-5")[0]).toBeTruthy();
     });
 
     it("shows life change indicators", async () => {

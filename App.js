@@ -74,9 +74,9 @@ export default function App() {
       }
 
       if (player === 1) {
-        setPlayer1Life((prev) => Math.max(0, prev + amount));
+        setPlayer1Life((prev) => prev + amount);
       } else {
-        setPlayer2Life((prev) => Math.max(0, prev + amount));
+        setPlayer2Life((prev) => prev + amount);
       }
 
       // Clear existing timeout
