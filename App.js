@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as KeepAwake from "expo-keep-awake";
+import * as Haptics from "expo-haptics";
 
 const { width, height } = Dimensions.get("window");
 
@@ -62,6 +63,15 @@ export default function App() {
   const adjustLife = useCallback(
     (player, amount) => {
       const playerKey = `player${player}`;
+
+      // Haptic feedback - different patterns for different amounts
+      if (Platform.OS !== "web") {
+        if (Math.abs(amount) === 1) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } else {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }
+      }
 
       if (player === 1) {
         setPlayer1Life((prev) => Math.max(0, prev + amount));
