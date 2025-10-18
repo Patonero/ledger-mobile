@@ -54,7 +54,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: quality-checks
     if: needs.quality-checks.outputs.should-release == 'true'
-    
+    permissions:
+      contents: write  # Required to push commits, tags, and create releases
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4

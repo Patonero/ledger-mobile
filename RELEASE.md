@@ -170,6 +170,27 @@ git push origin main --tags
 
 Or include a `feat:` or `fix:` commit that summarizes the changes.
 
+### Permission Denied (403) When Pushing Tags
+
+**Problem**: GitHub Action fails with `Permission denied` or `unable to access` error when trying to push commits/tags.
+
+**Error message:**
+```
+remote: Permission to YOUR_USERNAME/ledger-mobile.git denied to github-actions[bot].
+fatal: unable to access 'https://github.com/...': The requested URL returned error: 403
+```
+
+**Solution**: This is already fixed in the workflow file! The `release` job has `permissions: contents: write` which grants the necessary access.
+
+**If you still see this error:**
+1. Make sure you're using the latest version of `.github/workflows/ci-cd.yml`
+2. Check your repository settings:
+   - Go to **Settings** → **Actions** → **General**
+   - Scroll to **Workflow permissions**
+   - Ensure "Read and write permissions" is selected (or at minimum, read permissions with the workflow explicitly granting write)
+   - Click **Save**
+3. Re-run the failed workflow from the Actions tab
+
 ## Checking Current Version
 
 ```bash
