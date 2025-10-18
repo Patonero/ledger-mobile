@@ -111,10 +111,8 @@ Go to https://github.com/YOUR_USERNAME/ledger-mobile/releases/new
 - Update dependencies
 - Improve test coverage
 
-## 📱 App Store Links
-- 🍎 **iOS**: Coming soon to the App Store
-- 🤖 **Android**: Coming soon to Google Play Store
-- 🌐 **Web**: [Try it online](https://ledger-mobile.netlify.app)
+## 📱 Download
+- 🤖 **Android APK**: Download the APK file from the release assets below to install manually on your device
 
 ## 🛠️ Technical Details
 - **React Native**: 0.79.5
