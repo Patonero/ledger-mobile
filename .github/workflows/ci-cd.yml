@@ -75,15 +75,19 @@ jobs:
         id: version
         run: |
           # Get commits since last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           echo "Last tag: $LAST_TAG"
-          
+
           # Get current version from package.json
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
-          
+
           # Analyze commits for version bump type
-          COMMITS=$(git log $LAST_TAG..HEAD --oneline)
+          if [ -n "$LAST_TAG" ]; then
+            COMMITS=$(git log $LAST_TAG..HEAD --oneline)
+          else
+            COMMITS=$(git log --oneline)
+          fi
           echo "Commits since last tag:"
           echo "$COMMITS"
           
@@ -130,10 +134,17 @@ jobs:
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           NEW_VERSION="v${{ steps.version.outputs.new-version }}"
-          
+
           echo "# 🚀 Release $NEW_VERSION" > CHANGELOG_TEMP.md
           echo "" >> CHANGELOG_TEMP.md
-          
+
+          if [ -n "$LAST_TAG" ]; then
+            echo "📝 Changes since $LAST_TAG" >> CHANGELOG_TEMP.md
+          else
+            echo "📝 Initial Release" >> CHANGELOG_TEMP.md
+          fi
+          echo "" >> CHANGELOG_TEMP.md
+
           # Get commits since last tag
           if [ -n "$LAST_TAG" ]; then
             COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"%h %s" --reverse)
