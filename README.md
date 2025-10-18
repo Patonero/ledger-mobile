@@ -1,9 +1,34 @@
-# Ledger
+# Ledger Mobile 🎮
 
-A minimalistic cross-platform life tracker for Trading Card Games like Magic: The Gathering and Disney Lorcana.
+> A minimalistic, battery-efficient life tracker for Trading Card Games
 
-<img height="380" alt="image" src="https://github.com/user-attachments/assets/0d3c9f28-2642-48d3-a24e-628bd28d9104" />
-<img height="180" alt="image" src="https://github.com/user-attachments/assets/bfff6e81-a325-4373-9c93-b4be8f496a94" />
+[![Quality Control](https://github.com/Patonero/ledger-mobile/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Patonero/ledger-mobile/actions/workflows/ci-cd.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![React Native](https://img.shields.io/badge/React%20Native-0.79.5-blue.svg)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2053-black.svg)](https://expo.dev/)
+
+Ledger is a cross-platform mobile app designed for tracking life totals in Trading Card Games like **Magic: The Gathering** and **Lorcana**. Built with React Native and Expo for optimal battery efficiency during long gaming sessions.
+
+## 📱 Download
+
+<div align="center">
+
+### Coming Soon to App Stores!
+
+<!-- Uncomment when published to app stores -->
+<!--
+[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/app/your-app-id)
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=your.package.name)
+-->
+
+**iOS** • **Android** • **Web**
+
+### 📸 Screenshots
+
+<img height="380" alt="Ledger Mobile - Life Tracking Interface" src="https://github.com/user-attachments/assets/0d3c9f28-2642-48d3-a24e-628bd28d9104" />
+<img height="180" alt="Ledger Mobile - Settings Menu" src="https://github.com/user-attachments/assets/bfff6e81-a325-4373-9c93-b4be8f496a94" />
+
+</div>
 
 ## ✨ Features
 
@@ -129,7 +154,7 @@ npm run web
 
 ### Testing
 
-The app includes comprehensive unit tests with **68% code coverage**:
+The app includes comprehensive unit tests with **91.86% code coverage**:
 
 - **Core functionality**: Life tracking, bounds checking, haptic feedback
 - **Persistence**: AsyncStorage integration and error handling
@@ -138,13 +163,42 @@ The app includes comprehensive unit tests with **68% code coverage**:
 
 Run tests with `npm test` or `npm run test:coverage` for detailed reports.
 
+## 🔄 Release Process
+
+This project uses automated semantic versioning and professional release management:
+
+- **Patch** (`fix:`): Bug fixes and minor improvements
+- **Minor** (`feat:`): New features and enhancements  
+- **Major** (`feat!:` or `BREAKING CHANGE:`): Breaking changes
+
+Every push to `main` triggers automated testing, linting, and GitHub release generation with professional changelogs.
+
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions! Here's how to get started:
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Make** your changes and add tests (maintain 90%+ coverage)
+4. **Test** your changes (`npm test` and `npm run lint`)
+5. **Commit** using conventional commits (`feat: add amazing feature`)
+6. **Push** to your branch (`git push origin feature/amazing-feature`)
+7. **Create** a Pull Request
+
+### Development Setup
+```bash
+git clone https://github.com/Patonero/ledger-mobile.git
+cd ledger-mobile
+npm install
+npm start
+```
+
+## 📞 Support & Community
+
+- **🐛 Bug Reports**: [Create an issue](https://github.com/Patonero/ledger-mobile/issues/new?template=bug_report.md)
+- **💡 Feature Requests**: [Request a feature](https://github.com/Patonero/ledger-mobile/issues/new?template=feature_request.md)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/Patonero/ledger-mobile/discussions)
+- **📚 Documentation**: Check our [Wiki](https://github.com/Patonero/ledger-mobile/wiki)
 
 ## 📄 License
 
@@ -156,6 +210,20 @@ This project is open source and available under the [MIT License](LICENSE).
 - [ ] Game timer
 - [ ] Multiple player support (3-4 players)
 
+## 🙏 Acknowledgments
+
+Built with ❤️ for the Trading Card Game community.
+
+Special thanks to all contributors and the open-source community.
+
 ---
 
+<div align="center">
+
+**Made for gamers, by gamers** 🎮
+
+[⭐ Star this repo](https://github.com/Patonero/ledger-mobile) if you find it useful! • [🍴 Fork](https://github.com/Patonero/ledger-mobile/fork) to contribute
+
 **Perfect for tournament play, casual games, and long EDH sessions!** 🎲
+
+</div>

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 General Discussion
+    url: https://github.com/Patonero/ledger-mobile/discussions
+    about: Ask questions, share ideas, or discuss the app with the community
+  - name: 📚 Documentation
+    url: https://github.com/Patonero/ledger-mobile/wiki
+    about: Check our wiki for setup guides and troubleshooting
+  - name: 🛡️ Security Issue
+    url: https://github.com/Patonero/ledger-mobile/security/advisories/new
+    about: Report a security vulnerability (private disclosure)
