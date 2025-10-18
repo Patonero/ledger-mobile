@@ -322,21 +322,21 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "180deg" }],
   },
   decreaseZone: {
-    flex: 1,
+    flex: 0.7,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "transparent",
   },
   increaseZone: {
-    flex: 1,
+    flex: 0.7,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "transparent",
   },
   lifeZone: {
-    flex: 1,
+    flex: 1.6,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   lifeTotal: {
     color: "#fff",
-    fontSize: 70,
+    fontSize: 84,
     fontWeight: "300",
     textAlign: "center",
     letterSpacing: -1,
