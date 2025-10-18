@@ -347,7 +347,8 @@ const styles = StyleSheet.create({
   lifeTotal: {
     color: "#fff",
     fontSize: 84,
-    fontWeight: "300",
+    fontWeight: "600",
+    fontFamily: Platform.OS === "ios" ? "System" : "Roboto",
     textAlign: "center",
     letterSpacing: -1,
   },
@@ -363,7 +364,8 @@ const styles = StyleSheet.create({
     top: -32,
     color: "#fff",
     fontSize: 20,
-    fontWeight: "300",
+    fontWeight: "500",
+    fontFamily: Platform.OS === "ios" ? "System" : "Roboto",
     textAlign: "center",
     alignSelf: "center",
     opacity: 0.8,
@@ -371,7 +373,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 48,
-    fontWeight: "300",
+    fontWeight: "500",
+    fontFamily: Platform.OS === "ios" ? "System" : "Roboto",
     opacity: 0.6,
   },
   centerSection: {
