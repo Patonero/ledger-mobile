@@ -240,30 +240,93 @@ jobs:
         run: npm ci
 
       - name: Build Android APK
-        run: eas build --platform android --profile preview-apk --non-interactive --no-wait
+        id: build
+        run: |
+          # Start the build and capture the output
+          BUILD_OUTPUT=$(eas build --platform android --profile preview-apk --non-interactive --no-wait 2>&1)
+          echo "$BUILD_OUTPUT"
+
+          # Extract build ID from output
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Build ID:\s*\K[a-f0-9-]+' || echo "$BUILD_OUTPUT" | grep -oP 'https://expo.dev/accounts/[^/]+/projects/[^/]+/builds/\K[a-f0-9-]+')
+
+          if [ -z "$BUILD_ID" ]; then
+            echo "Error: Could not extract build ID from output"
+            echo "Output was: $BUILD_OUTPUT"
+            exit 1
+          fi
+
+          echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "Successfully started build: $BUILD_ID"
 
       - name: Download APK
         run: |
-          # Wait for build to complete and get the artifact URL
-          BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
+          BUILD_ID="${{ steps.build.outputs.build-id }}"
           echo "Waiting for build $BUILD_ID to complete..."
+          echo "Build URL: https://expo.dev/accounts/$(eas whoami)/projects/ledger-mobile/builds/$BUILD_ID"
 
-          while true; do
-            STATUS=$(eas build:view $BUILD_ID --json | jq -r '.status')
-            if [ "$STATUS" = "FINISHED" ]; then
-              echo "Build completed successfully"
-              break
-            elif [ "$STATUS" = "ERRORED" ] || [ "$STATUS" = "CANCELED" ]; then
-              echo "Build failed with status: $STATUS"
-              exit 1
+          # Set timeout (60 minutes)
+          TIMEOUT=3600
+          ELAPSED=0
+          INTERVAL=30
+
+          while [ $ELAPSED -lt $TIMEOUT ]; do
+            # Get build status - capture output for debugging
+            BUILD_INFO=$(eas build:view $BUILD_ID --json 2>&1)
+
+            # Check if output is valid JSON
+            if ! echo "$BUILD_INFO" | jq -e . >/dev/null 2>&1; then
+              echo "Warning: Invalid JSON response from EAS:"
+              echo "$BUILD_INFO"
+              echo "Retrying in $INTERVAL seconds..."
+              sleep $INTERVAL
+              ELAPSED=$((ELAPSED + INTERVAL))
+              continue
             fi
-            echo "Build status: $STATUS, waiting..."
-            sleep 30
+
+            STATUS=$(echo "$BUILD_INFO" | jq -r '.status')
+            echo "Build status: $STATUS (elapsed: ${ELAPSED}s)"
+
+            if [ "$STATUS" = "FINISHED" ]; then
+              echo "✅ Build completed successfully!"
+
+              # Extract APK URL
+              APK_URL=$(echo "$BUILD_INFO" | jq -r '.artifacts.buildUrl')
+
+              if [ -z "$APK_URL" ] || [ "$APK_URL" = "null" ]; then
+                echo "Error: Could not find APK URL in build info"
+                echo "Build info: $BUILD_INFO"
+                exit 1
+              fi
+
+              echo "Downloading APK from: $APK_URL"
+              curl -L -o ledger-mobile.apk "$APK_URL"
+
+              # Verify download
+              if [ ! -f ledger-mobile.apk ]; then
+                echo "Error: APK file was not downloaded"
+                exit 1
+              fi
+
+              APK_SIZE=$(ls -lh ledger-mobile.apk | awk '{print $5}')
+              echo "✅ APK downloaded successfully (size: $APK_SIZE)"
+              exit 0
+
+            elif [ "$STATUS" = "ERRORED" ] || [ "$STATUS" = "CANCELED" ]; then
+              echo "❌ Build failed with status: $STATUS"
+              echo "Build info: $BUILD_INFO"
+              exit 1
+            elif [ "$STATUS" = "IN_PROGRESS" ] || [ "$STATUS" = "PENDING" ] || [ "$STATUS" = "IN_QUEUE" ]; then
+              echo "⏳ Build is $STATUS, waiting..."
+            else
+              echo "Unknown status: $STATUS"
+            fi
+
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
           done
 
-          # Download the APK
-          APK_URL=$(eas build:view $BUILD_ID --json | jq -r '.artifacts.buildUrl')
-          curl -L -o ledger-mobile.apk "$APK_URL"
+          echo "❌ Build timed out after ${TIMEOUT}s"
+          exit 1
 
       - name: Upload APK to Release
         uses: actions/upload-release-asset@v1
