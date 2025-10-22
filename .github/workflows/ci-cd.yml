@@ -270,14 +270,12 @@ jobs:
           INTERVAL=30
 
           while [ $ELAPSED -lt $TIMEOUT ]; do
-            # Get build status - capture output for debugging
-            BUILD_INFO=$(eas build:view $BUILD_ID --json 2>&1)
+            # Get build status - redirect stderr and extract only the JSON
+            BUILD_INFO=$(eas build:view $BUILD_ID --json 2>&1 | grep -E '^\{' | tail -1)
 
-            # Check if output is valid JSON
-            if ! echo "$BUILD_INFO" | jq -e . >/dev/null 2>&1; then
-              echo "Warning: Invalid JSON response from EAS:"
-              echo "$BUILD_INFO"
-              echo "Retrying in $INTERVAL seconds..."
+            # Check if we got valid JSON
+            if [ -z "$BUILD_INFO" ] || ! echo "$BUILD_INFO" | jq -e . >/dev/null 2>&1; then
+              echo "Waiting for build info... (elapsed: ${ELAPSED}s)"
               sleep $INTERVAL
               ELAPSED=$((ELAPSED + INTERVAL))
               continue
