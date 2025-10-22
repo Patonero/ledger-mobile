@@ -264,25 +264,28 @@ jobs:
           echo "Waiting for build $BUILD_ID to complete..."
           echo "Build URL: https://expo.dev/accounts/$(eas whoami)/projects/ledger-mobile/builds/$BUILD_ID"
 
-          # Set timeout (60 minutes)
+          # Set timeout (60 minutes) and retry limits
           TIMEOUT=3600
           ELAPSED=0
           INTERVAL=30
+          MAX_RETRIES=120  # 120 retries × 30s = 60 minutes max
+          RETRY_COUNT=0
 
-          while [ $ELAPSED -lt $TIMEOUT ]; do
+          while [ $ELAPSED -lt $TIMEOUT ] && [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             # Get build status - redirect stderr and extract only the JSON
             BUILD_INFO=$(eas build:view $BUILD_ID --json 2>&1 | grep -E '^\{' | tail -1)
 
             # Check if we got valid JSON
             if [ -z "$BUILD_INFO" ] || ! echo "$BUILD_INFO" | jq -e . >/dev/null 2>&1; then
-              echo "Waiting for build info... (elapsed: ${ELAPSED}s)"
+              echo "Waiting for build info... (elapsed: ${ELAPSED}s, attempt: $((RETRY_COUNT + 1))/$MAX_RETRIES)"
               sleep $INTERVAL
               ELAPSED=$((ELAPSED + INTERVAL))
+              RETRY_COUNT=$((RETRY_COUNT + 1))
               continue
             fi
 
             STATUS=$(echo "$BUILD_INFO" | jq -r '.status')
-            echo "Build status: $STATUS (elapsed: ${ELAPSED}s)"
+            echo "Build status: $STATUS (elapsed: ${ELAPSED}s, attempt: $((RETRY_COUNT + 1))/$MAX_RETRIES)"
 
             if [ "$STATUS" = "FINISHED" ]; then
               echo "✅ Build completed successfully!"
@@ -321,9 +324,10 @@ jobs:
 
             sleep $INTERVAL
             ELAPSED=$((ELAPSED + INTERVAL))
+            RETRY_COUNT=$((RETRY_COUNT + 1))
           done
 
-          echo "❌ Build timed out after ${TIMEOUT}s"
+          echo "❌ Build timed out after ${ELAPSED}s and ${RETRY_COUNT} attempts"
           exit 1
 
       - name: Upload APK to Release
