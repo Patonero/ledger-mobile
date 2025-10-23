@@ -272,8 +272,8 @@ jobs:
           RETRY_COUNT=0
 
           while [ $ELAPSED -lt $TIMEOUT ] && [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            # Get build status - redirect stderr and extract only the JSON
-            BUILD_INFO=$(eas build:view $BUILD_ID --json 2>&1 | grep -E '^\{' | tail -1)
+            # Get build status - extract JSON block (from first { to last })
+            BUILD_INFO=$(eas build:view $BUILD_ID --json 2>&1 | sed -n '/^{/,/^}/p')
 
             # Check if we got valid JSON
             if [ -z "$BUILD_INFO" ] || ! echo "$BUILD_INFO" | jq -e . >/dev/null 2>&1; then
