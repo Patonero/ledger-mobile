@@ -16,17 +16,39 @@ import * as NavigationBar from "expo-navigation-bar";
 
 const { width, height } = Dimensions.get("window");
 
+// Responsive sizing for small screens
+const isSmallScreen = width < 360;
+const buttonPadding = isSmallScreen ? 12 : 24;
+const buttonFontSize = isSmallScreen ? 16 : 24;
+const labelFontSize = isSmallScreen ? 12 : 16;
+
+// Battery-optimized dark color palette
+const COLOR_PALETTE = [
+  { name: "Black", value: "#000000" },
+  { name: "Dark Red", value: "#330000" },
+  { name: "Dark Blue", value: "#001a33" },
+  { name: "Dark Green", value: "#001a00" },
+  { name: "Dark Purple", value: "#1a0033" },
+  { name: "Dark Orange", value: "#331a00" },
+  { name: "Dark Teal", value: "#001a1a" },
+  { name: "Dark Magenta", value: "#33001a" },
+];
+
 export default function App() {
   const [player1Life, setPlayer1Life] = useState(20);
   const [player2Life, setPlayer2Life] = useState(20);
   const [startingLife, setStartingLife] = useState(20);
   const [menuVisible, setMenuVisible] = useState(false);
   const [lifeChanges, setLifeChanges] = useState({ player1: 0, player2: 0 });
+  const [player1Color, setPlayer1Color] = useState("#000000");
+  const [player2Color, setPlayer2Color] = useState("#000000");
+  const [colorPickerVisible, setColorPickerVisible] = useState(false);
+  const [colorPickerPlayer, setColorPickerPlayer] = useState(null);
   const timeoutRefs = useMemo(() => ({ player1: null, player2: null }), []);
 
-  // Load saved starting life on app start
+  // Load saved preferences on app start
   useEffect(() => {
-    const loadStartingLife = async () => {
+    const loadPreferences = async () => {
       try {
         const savedStartingLife = await AsyncStorage.getItem("startingLife");
         if (savedStartingLife !== null) {
@@ -35,12 +57,22 @@ export default function App() {
           setPlayer1Life(life);
           setPlayer2Life(life);
         }
+
+        const savedPlayer1Color = await AsyncStorage.getItem("player1Color");
+        if (savedPlayer1Color !== null) {
+          setPlayer1Color(savedPlayer1Color);
+        }
+
+        const savedPlayer2Color = await AsyncStorage.getItem("player2Color");
+        if (savedPlayer2Color !== null) {
+          setPlayer2Color(savedPlayer2Color);
+        }
       } catch (error) {
-        console.log("Error loading starting life:", error);
+        console.log("Error loading preferences:", error);
       }
     };
 
-    loadStartingLife();
+    loadPreferences();
   }, []);
 
   // Keep screen awake and hide navigation bar during gameplay (mobile only)
@@ -74,6 +106,17 @@ export default function App() {
       }
     }
   }, []);
+
+  // Ensure navigation bar stays hidden when modal opens
+  useEffect(() => {
+    if (Platform.OS === "android" && menuVisible) {
+      try {
+        NavigationBar.setVisibilityAsync("hidden");
+      } catch (error) {
+        console.log("Error hiding nav bar on modal open:", error);
+      }
+    }
+  }, [menuVisible]);
 
   const adjustLife = useCallback(
     (player, amount) => {
@@ -142,8 +185,83 @@ export default function App() {
     }
   }, []);
 
+  const openColorPicker = useCallback((playerNumber) => {
+    setColorPickerPlayer(playerNumber);
+    setColorPickerVisible(true);
+  }, []);
+
+  const selectPlayerColor = useCallback(
+    async (color) => {
+      if (colorPickerPlayer === 1) {
+        setPlayer1Color(color);
+        try {
+          await AsyncStorage.setItem("player1Color", color);
+        } catch (error) {
+          console.log("Error saving player 1 color:", error);
+        }
+      } else if (colorPickerPlayer === 2) {
+        setPlayer2Color(color);
+        try {
+          await AsyncStorage.setItem("player2Color", color);
+        } catch (error) {
+          console.log("Error saving player 2 color:", error);
+        }
+      }
+      setColorPickerVisible(false);
+      setColorPickerPlayer(null);
+    },
+    [colorPickerPlayer]
+  );
+
+  const ColorPicker = memo(({ visible, player, onSelectColor, onClose }) => {
+    const currentPlayerColor = player === 1 ? player1Color : player2Color;
+
+    return (
+      <Modal
+        visible={visible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View
+          style={[
+            styles.modalOverlay,
+            { justifyContent: "center", alignItems: "center" },
+          ]}
+        >
+          <View style={styles.colorPickerContent}>
+            <Text style={styles.colorPickerTitle}>Player {player} Color</Text>
+
+            <View style={styles.colorSwatchContainer}>
+              {COLOR_PALETTE.map((color) => (
+                <TouchableOpacity
+                  key={color.value}
+                  style={[
+                    styles.colorSwatch,
+                    { backgroundColor: color.value },
+                    currentPlayerColor === color.value &&
+                      styles.selectedColorSwatch,
+                  ]}
+                  onPress={() => onSelectColor(color.value)}
+                  activeOpacity={0.7}
+                />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.colorPickerCloseButton}
+              onPress={onClose}
+            >
+              <Text style={styles.colorPickerCloseButtonText}>Back</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  });
+
   const PlayerSection = memo(
-    ({ playerNumber, life, lifeChange, isTop = false }) => {
+    ({ playerNumber, life, lifeChange, isTop = false, backgroundColor }) => {
       const onDecreasePress = useCallback(
         () => adjustLife(playerNumber, -1),
         [adjustLife, playerNumber]
@@ -153,8 +271,12 @@ export default function App() {
         [adjustLife, playerNumber]
       );
       const containerStyle = useMemo(
-        () => [styles.playerSection, isTop && styles.topPlayer],
-        [isTop]
+        () => [
+          styles.playerSection,
+          isTop && styles.topPlayer,
+          { backgroundColor: backgroundColor },
+        ],
+        [isTop, backgroundColor]
       );
 
       return (
@@ -200,6 +322,7 @@ export default function App() {
         life={player2Life}
         lifeChange={lifeChanges.player2}
         isTop={true}
+        backgroundColor={player2Color}
       />
 
       <View style={styles.centerSection}>
@@ -218,80 +341,91 @@ export default function App() {
         onRequestClose={() => setMenuVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.modalButton} onPress={resetGame}>
-              <Text style={styles.modalButtonText}>Restart</Text>
+          {/* Row 1: RESTART */}
+          <View style={styles.menuRow}>
+            <TouchableOpacity style={styles.largeButton} onPress={resetGame}>
+              <Text style={styles.largeButtonText}>RESTART</Text>
             </TouchableOpacity>
+          </View>
 
-            <Text style={styles.modalTitle}>Starting Life</Text>
-
-            <View style={styles.lifeOptionsContainer}>
+          {/* Row 2: STARTING LIFE */}
+          <View style={styles.menuRowWithLabel}>
+            <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[
-                  styles.lifeOption,
-                  startingLife === 0 && styles.selectedLifeOption,
+                  styles.largeButton,
+                  startingLife === 0 && styles.selectedButton,
                 ]}
                 onPress={() => setStartingLifeTotal(0)}
               >
-                <Text
-                  style={[
-                    styles.lifeOptionText,
-                    startingLife === 0 && styles.selectedLifeOptionText,
-                  ]}
-                >
-                  0
-                </Text>
+                <Text style={styles.largeButtonText}>0</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
-                  styles.lifeOption,
-                  startingLife === 20 && styles.selectedLifeOption,
+                  styles.largeButton,
+                  startingLife === 20 && styles.selectedButton,
                 ]}
                 onPress={() => setStartingLifeTotal(20)}
               >
-                <Text
-                  style={[
-                    styles.lifeOptionText,
-                    startingLife === 20 && styles.selectedLifeOptionText,
-                  ]}
-                >
-                  20
-                </Text>
+                <Text style={styles.largeButtonText}>20</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
-                  styles.lifeOption,
-                  startingLife === 40 && styles.selectedLifeOption,
+                  styles.largeButton,
+                  startingLife === 40 && styles.selectedButton,
                 ]}
                 onPress={() => setStartingLifeTotal(40)}
               >
-                <Text
-                  style={[
-                    styles.lifeOptionText,
-                    startingLife === 40 && styles.selectedLifeOptionText,
-                  ]}
-                >
-                  40
-                </Text>
+                <Text style={styles.largeButtonText}>40</Text>
               </TouchableOpacity>
             </View>
+          </View>
 
+          {/* Row 3: PLAYER COLORS */}
+          <View style={styles.menuRow}>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.largeButton, { backgroundColor: player1Color }]}
+                onPress={() => openColorPicker(1)}
+              >
+                <Text style={styles.largeButtonText}>P1</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.largeButton, { backgroundColor: player2Color }]}
+                onPress={() => openColorPicker(2)}
+              >
+                <Text style={styles.largeButtonText}>P2</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Row 4: CLOSE */}
+          <View style={styles.menuRow}>
             <TouchableOpacity
-              style={styles.closeButton}
+              style={styles.largeButton}
               onPress={() => setMenuVisible(false)}
             >
-              <Text style={styles.closeButtonText}>Close</Text>
+              <Text style={styles.largeButtonText}>CLOSE</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
+      <ColorPicker
+        visible={colorPickerVisible}
+        player={colorPickerPlayer}
+        onSelectColor={selectPlayerColor}
+        onClose={() => setColorPickerVisible(false)}
+      />
+
       <PlayerSection
         playerNumber={1}
         life={player1Life}
         lifeChange={lifeChanges.player1}
+        backgroundColor={player1Color}
       />
     </View>
   );
@@ -401,22 +535,56 @@ const styles = StyleSheet.create({
     fontSize: 28,
     opacity: 0.5,
   },
-  modal: {
-    display: "flex",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    width: width,
-    height: height,
-    backgroundColor: "red",
-  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, .85)",
+    backgroundColor: "#000",
+    flexDirection: "column",
+  },
+  menuRow: {
+    flex: 1,
+    padding: 8,
+    justifyContent: "center",
+  },
+  menuRowWithLabel: {
+    flex: 1,
+    padding: 8,
+    flexDirection: "column",
+  },
+  menuLabel: {
+    color: "#fff",
+    fontSize: labelFontSize,
+    fontWeight: "500",
+    opacity: 0.7,
+    textAlign: "center",
+    paddingVertical: 8,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    flex: 1,
+    gap: 8,
+  },
+  largeButton: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    padding: buttonPadding,
   },
-  modalContent: {
+  selectedButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderColor: "rgba(255, 255, 255, 0.6)",
+  },
+  largeButtonText: {
+    color: "#fff",
+    fontSize: buttonFontSize,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  // Color picker modal styles
+  colorPickerContent: {
     backgroundColor: "#000",
     borderRadius: 8,
     borderWidth: 1,
@@ -425,69 +593,46 @@ const styles = StyleSheet.create({
     alignItems: "center",
     minWidth: 240,
   },
-  modalTitle: {
+  colorPickerTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "500",
+    marginBottom: 16,
+    opacity: 0.9,
+  },
+  colorPickerCloseButton: {
+    backgroundColor: "transparent",
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    marginTop: 8,
+  },
+  colorPickerCloseButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "400",
-    marginTop: 16,
-    marginBottom: 12,
-    opacity: 0.9,
-  },
-  modalButton: {
-    backgroundColor: "transparent",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.3)",
-    marginBottom: 12,
-  },
-  modalButtonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "400",
-    opacity: 0.9,
-  },
-  lifeOptionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  lifeOption: {
-    backgroundColor: "transparent",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.2)",
-    marginHorizontal: 4,
-  },
-  selectedLifeOption: {
-    borderColor: "rgba(255, 255, 255, 0.6)",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-  },
-  lifeOptionText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "400",
-    opacity: 0.9,
-  },
-  selectedLifeOptionText: {
-    color: "#fff",
-    opacity: 1,
-  },
-  closeButton: {
-    backgroundColor: "transparent",
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.2)",
-  },
-  closeButtonText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "400",
     opacity: 0.8,
+    textAlign: "center",
+  },
+  colorSwatchContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 12,
+    marginVertical: 16,
+    maxWidth: 240,
+  },
+  colorSwatch: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+  },
+  selectedColorSwatch: {
+    borderColor: "rgba(255, 255, 255, 0.8)",
+    borderWidth: 3,
   },
 });
