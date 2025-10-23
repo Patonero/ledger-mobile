@@ -228,6 +228,7 @@ export default function App() {
           <View style={styles.menuRow}>
             <View style={styles.buttonRow}>
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[0].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[0].value },
@@ -238,6 +239,7 @@ export default function App() {
               ></TouchableOpacity>
 
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[1].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[1].value },
@@ -253,6 +255,7 @@ export default function App() {
           <View style={styles.menuRow}>
             <View style={styles.buttonRow}>
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[2].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[2].value },
@@ -263,6 +266,7 @@ export default function App() {
               ></TouchableOpacity>
 
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[3].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[3].value },
@@ -278,6 +282,7 @@ export default function App() {
           <View style={styles.menuRow}>
             <View style={styles.buttonRow}>
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[4].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[4].value },
@@ -288,6 +293,7 @@ export default function App() {
               ></TouchableOpacity>
 
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[5].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[5].value },
@@ -303,6 +309,7 @@ export default function App() {
           <View style={styles.menuRow}>
             <View style={styles.buttonRow}>
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[6].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[6].value },
@@ -313,6 +320,7 @@ export default function App() {
               ></TouchableOpacity>
 
               <TouchableOpacity
+                testID={`color-button-${COLOR_PALETTE[7].value}`}
                 style={[
                   styles.largeButton,
                   { backgroundColor: COLOR_PALETTE[7].value },
