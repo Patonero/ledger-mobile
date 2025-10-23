@@ -150,24 +150,29 @@ jobs:
           fi
           echo "" >> CHANGELOG_TEMP.md
 
-          # Get commits since last tag
+          # Get commits since last tag, excluding bot commits
           if [ -n "$LAST_TAG" ]; then
-            COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"%h %s" --reverse)
+            # Get commits with author email, filter out bots, then remove email prefix
+            COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"%ae|%h %s" --reverse | \
+                      grep -vE "(action@github\.com|\[bot\]|Bot@|noreply@github\.com)" | \
+                      cut -d'|' -f2)
           else
-            COMMITS=$(git log --pretty=format:"%h %s" --reverse)
+            COMMITS=$(git log --pretty=format:"%ae|%h %s" --reverse | \
+                      grep -vE "(action@github\.com|\[bot\]|Bot@|noreply@github\.com)" | \
+                      cut -d'|' -f2)
           fi
           
           # Categorize commits
           echo "## ✨ Features" >> CHANGELOG_TEMP.md
-          echo "$COMMITS" | grep "^[a-f0-9]* feat" | sed 's/^[a-f0-9]* feat[(:]*[^:)]*/- /' || echo "- No new features" >> CHANGELOG_TEMP.md
+          echo "$COMMITS" | grep "^[a-f0-9]* feat" | sed 's/^[a-f0-9]* [a-z]*\([^:]*\): /- /' >> CHANGELOG_TEMP.md || echo "- No new features" >> CHANGELOG_TEMP.md
           echo "" >> CHANGELOG_TEMP.md
-          
+
           echo "## 🐛 Bug Fixes" >> CHANGELOG_TEMP.md
-          echo "$COMMITS" | grep "^[a-f0-9]* fix" | sed 's/^[a-f0-9]* fix[(:]*[^:)]*/- /' || echo "- No bug fixes" >> CHANGELOG_TEMP.md
+          echo "$COMMITS" | grep "^[a-f0-9]* fix" | sed 's/^[a-f0-9]* [a-z]*\([^:]*\): /- /' >> CHANGELOG_TEMP.md || echo "- No bug fixes" >> CHANGELOG_TEMP.md
           echo "" >> CHANGELOG_TEMP.md
-          
+
           echo "## 🏗️ Technical Improvements" >> CHANGELOG_TEMP.md
-          echo "$COMMITS" | grep -E "^[a-f0-9]* (chore|ci|docs|style|refactor|perf|test)" | sed 's/^[a-f0-9]* [^:]*[(:]*[^:)]*/- /' || echo "- No technical improvements" >> CHANGELOG_TEMP.md
+          echo "$COMMITS" | grep -E "^[a-f0-9]* (chore|ci|docs|style|refactor|perf|test)" | sed 's/^[a-f0-9]* [a-z]*\([^:]*\): /- /' >> CHANGELOG_TEMP.md || echo "- No technical improvements" >> CHANGELOG_TEMP.md
           echo "" >> CHANGELOG_TEMP.md
           
           echo "## 📱 Download" >> CHANGELOG_TEMP.md
