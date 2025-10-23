@@ -223,36 +223,111 @@ export default function App() {
         animationType="fade"
         onRequestClose={onClose}
       >
-        <View
-          style={[
-            styles.modalOverlay,
-            { justifyContent: "center", alignItems: "center" },
-          ]}
-        >
-          <View style={styles.colorPickerContent}>
-            <Text style={styles.colorPickerTitle}>Player {player} Color</Text>
+        <View style={styles.modalOverlay}>
+          {/* Row 1: Black, Dark Red */}
+          <View style={styles.menuRow}>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[0].value },
+                  currentPlayerColor === COLOR_PALETTE[0].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[0].value)}
+              ></TouchableOpacity>
 
-            <View style={styles.colorSwatchContainer}>
-              {COLOR_PALETTE.map((color) => (
-                <TouchableOpacity
-                  key={color.value}
-                  style={[
-                    styles.colorSwatch,
-                    { backgroundColor: color.value },
-                    currentPlayerColor === color.value &&
-                      styles.selectedColorSwatch,
-                  ]}
-                  onPress={() => onSelectColor(color.value)}
-                  activeOpacity={0.7}
-                />
-              ))}
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[1].value },
+                  currentPlayerColor === COLOR_PALETTE[1].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[1].value)}
+              ></TouchableOpacity>
             </View>
+          </View>
 
-            <TouchableOpacity
-              style={styles.colorPickerCloseButton}
-              onPress={onClose}
-            >
-              <Text style={styles.colorPickerCloseButtonText}>Back</Text>
+          {/* Row 2: Dark Blue, Dark Green */}
+          <View style={styles.menuRow}>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[2].value },
+                  currentPlayerColor === COLOR_PALETTE[2].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[2].value)}
+              ></TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[3].value },
+                  currentPlayerColor === COLOR_PALETTE[3].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[3].value)}
+              ></TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Row 3: Dark Purple, Dark Orange */}
+          <View style={styles.menuRow}>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[4].value },
+                  currentPlayerColor === COLOR_PALETTE[4].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[4].value)}
+              ></TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[5].value },
+                  currentPlayerColor === COLOR_PALETTE[5].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[5].value)}
+              ></TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Row 4: Dark Teal, Dark Magenta */}
+          <View style={styles.menuRow}>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[6].value },
+                  currentPlayerColor === COLOR_PALETTE[6].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[6].value)}
+              ></TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.largeButton,
+                  { backgroundColor: COLOR_PALETTE[7].value },
+                  currentPlayerColor === COLOR_PALETTE[7].value &&
+                    styles.selectedButton,
+                ]}
+                onPress={() => onSelectColor(COLOR_PALETTE[7].value)}
+              ></TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Row 5: BACK button */}
+          <View style={styles.menuRow}>
+            <TouchableOpacity style={styles.largeButton} onPress={onClose}>
+              <Text style={styles.largeButtonText}>BACK</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -574,7 +649,6 @@ const styles = StyleSheet.create({
     padding: buttonPadding,
   },
   selectedButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderColor: "rgba(255, 255, 255, 0.6)",
   },
   largeButtonText: {
@@ -582,57 +656,5 @@ const styles = StyleSheet.create({
     fontSize: buttonFontSize,
     fontWeight: "600",
     textAlign: "center",
-  },
-  // Color picker modal styles
-  colorPickerContent: {
-    backgroundColor: "#000",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.15)",
-    padding: 24,
-    alignItems: "center",
-    minWidth: 240,
-  },
-  colorPickerTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "500",
-    marginBottom: 16,
-    opacity: 0.9,
-  },
-  colorPickerCloseButton: {
-    backgroundColor: "transparent",
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.2)",
-    marginTop: 8,
-  },
-  colorPickerCloseButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "400",
-    opacity: 0.8,
-    textAlign: "center",
-  },
-  colorSwatchContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 12,
-    marginVertical: 16,
-    maxWidth: 240,
-  },
-  colorSwatch: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.2)",
-  },
-  selectedColorSwatch: {
-    borderColor: "rgba(255, 255, 255, 0.8)",
-    borderWidth: 3,
   },
 });
